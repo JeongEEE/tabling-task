@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>예약 목록</title>
+	<link rel="stylesheet" type="text/css" href="./css/style.css">
+</head>
+<body>
+	<div class="main_warp">
+		<div class="main_content">
+			<div class="title">예약 목록</div>
+			<div class="content">
+				<div class="item_box"></div>
+				<div class="info_box">
+					<div>예약 정보</div>
+					<div>고객 정보</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+<script>
+	const fetchData = () => {
+		var xhr = new XMLHttpRequest();
+		xhr.open('GET', 'https://frontend.tabling.co.kr/v1/store/9533/reservations', true);
+		xhr.send();
+		xhr.onload = () => {
+			if (xhr.status == 200) {
+				const data = JSON.parse(xhr.response);
+				console.log(data);
+				data.reservations.forEach((el, index) => {
+					document.querySelector(".item_box").innerHTML += `<div class="item">
+						<div class="item_status">
+							<div>${el.timeRegistered}</div>
+							<div>${el.status}</div>
+						</div>
+						<div class="item_detail">
+							<div class="table">${el.customer.name} - 테이블명 [<p class="table_name${index}"></p>]</div>
+							<div>성인 ${el.customer.adult} 아이 ${el.customer.child}</div>
+							<div class="menu">메뉴명(갯수) [<p class="menu${index}"></p>]</div>
+						</div>
+						<div class="item_control">
+
+						</div>
+					</div>`
+					el.tables.forEach((table) => {
+						document.querySelector(`.table_name${index}`).innerHTML += `, ${table.name}`
+					});
+					el.menus.forEach((menu) => {
+						document.querySelector(`.menu${index}`).innerHTML += `, ${menu.name}(${menu.qty})`
+					});
+				});
+			} else {
+				
+			}
+		}
+	}
+	fetchData();
+</script>
+</html>
