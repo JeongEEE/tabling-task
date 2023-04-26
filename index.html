@@ -23,6 +23,7 @@
 	</div>
 </body>
 <script>
+	let reservationDatas = [];
 	const fetchData = () => {
 		var xhr = new XMLHttpRequest();
 		xhr.open('GET', 'https://frontend.tabling.co.kr/v1/store/9533/reservations', true);
@@ -30,12 +31,13 @@
 		xhr.onload = () => {
 			if (xhr.status == 200) {
 				const data = JSON.parse(xhr.response);
+				reservationDatas = data.reservations;
 				console.log(data);
 				data.reservations.forEach((el, index) => {
-					document.querySelector(".item_box").innerHTML += `<div class="item">
+					document.querySelector(".item_box").innerHTML += `<div class="item item${index}" style="display: ${el.status == 'done'? 'none':'flex'};">
 						<div class="item_status">
 							<div>${el.timeRegistered}</div>
-							<div>${el.status}</div>
+							<div style="color:${el.status == 'reserved' ? '#3BB94C':'#162149'};">${el.status}</div>
 						</div>
 						<div class="item_detail">
 							<div class="table">${el.customer.name} - 테이블명 [<p class="table_name${index}"></p>]</div>
@@ -43,7 +45,7 @@
 							<div class="menu">메뉴명(갯수) [<p class="menu${index}"></p>]</div>
 						</div>
 						<div class="item_control">
-
+							<button class="pur_btn" style="background-color: ${el.status == 'reserved' ? 'rgb(22, 30, 64)':'white'};color: ${el.status == 'reserved' ? 'white':'black'};">${el.status == 'reserved' ? '착석':'퇴석'}</button>
 						</div>
 					</div>`
 					el.tables.forEach((table) => {
@@ -51,6 +53,20 @@
 					});
 					el.menus.forEach((menu) => {
 						document.querySelector(`.menu${index}`).innerHTML += `, ${menu.name}(${menu.qty})`
+					});
+				});
+				const buttons = document.querySelectorAll('.pur_btn'); // 모든 버튼 요소 선택
+				buttons.forEach((button, idx) => {
+					button.addEventListener('click', (event) => {
+						console.log(button.textContent); // 버튼의 텍스트 콘솔 출력
+						if(button.textContent == '착석') {
+							event.target.textContent = '퇴석';
+							button.style.backgroundColor = 'white';
+							button.style.color = 'black';
+						} else {
+							const item = document.querySelector(`.item${idx}`)
+							item.remove();
+						}
 					});
 				});
 			} else {
