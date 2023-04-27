@@ -51,10 +51,10 @@
 		xhr.send();
 		xhr.onload = () => {
 			if (xhr.status == 200) {
-				const data = JSON.parse(xhr.response);
-				reservationDatas = data.reservations;
-				console.log(data);
-				data.reservations.forEach((el, index) => {
+				const data = JSON.parse(xhr.response).reservations;
+				reservationDatas = data;
+				console.log('reservationDatas', data);
+				data.forEach((el, index) => {
 					document.querySelector(".item_box").innerHTML += `<div class="item item${index}" style="display: ${el.status == 'done'? 'none':'flex'};">
 						<div class="item_status">
 							<div>${el.timeRegistered}</div>
@@ -166,6 +166,7 @@
 						`
 					}
 				}
+				if(!isMobile) boxClick(0);
 				const status_boxs = document.querySelectorAll('.item_status');
 				status_boxs.forEach((box, idx) => {
 					box.addEventListener('click', (event) => {
