@@ -17,7 +17,7 @@
 			</div>
 		</div>
 		<div class="drawer" onClick="drawerClick()">
-			<div class="mobile_info_box">test</div>
+			<div class="mobile_info_box"></div>
 		</div>
 	</div>
 </body>
@@ -58,7 +58,7 @@
 					document.querySelector(".item_box").innerHTML += `<div class="item item${index}" style="display: ${el.status == 'done'? 'none':'flex'};">
 						<div class="item_status">
 							<div>${el.timeRegistered}</div>
-							<div style="color:${el.status == 'reserved' ? '#3BB94C':'#162149'};">${el.status}</div>
+							<div style="color:${el.status == 'reserved' ? '#3BB94C':'#162149'};">${el.status == 'reserved' ? '예약':'착석 중'}</div>
 						</div>
 						<div class="item_detail">
 							<div class="table">${el.customer.name} - 테이블명 [<p class="table_name${index}"></p>]</div>
@@ -95,7 +95,7 @@
 						<div class="info_main_title">예약 정보</div>
 						<div class="row" style="column-gap: 24px;">
 							<div class="info_sub_title">예약 상태</div>
-							<div>${reservationDatas[idx].status}</div>
+							<div style="color:${reservationDatas[idx].status == 'reserved' ? '#3BB94C':'#162149'};">${reservationDatas[idx].status == 'reserved' ? '예약':'착석 중'}</div>
 						</div>
 						<div class="row" style="column-gap: 24px;">
 							<div class="info_sub_title">예약 시간</div>
@@ -135,7 +135,7 @@
 								<div class="info_main_title">예약 정보</div>
 								<div class="row" style="column-gap: 24px;">
 									<div class="info_sub_title">예약 상태</div>
-									<div>${reservationDatas[idx].status}</div>
+									<div style="color:${reservationDatas[idx].status == 'reserved' ? '#3BB94C':'#162149'};">${reservationDatas[idx].status == 'reserved' ? '예약':'착석 중'}</div>
 								</div>
 								<div class="row" style="column-gap: 24px;">
 									<div class="info_sub_title">예약 시간</div>

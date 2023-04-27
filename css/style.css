@@ -1,4 +1,9 @@
 @charset "UTF-8";
+@font-face {
+  font-family: AppleMyungjo;
+  src: local("Apple SD Gothic Neo"), local("Nanum Gothic");
+}
+
 body {
   background-color: rgb(199, 211, 224);
   margin: 0;
@@ -145,6 +150,7 @@ p {
 
 .pur_btn {
   background-color: rgb(22, 30, 64);
+  border: 1px solid rgb(22, 30, 64);
   border-radius: 4px;
   color: white;
   width: 4rem;
@@ -191,7 +197,7 @@ p {
 .mobile_info_box {
   position: absolute;
   animation-name: slideUp;
-  animation-delay: 0s;
+  animation-delay: -0.5s;
   animation-duration: 1.5s;
   animation-timing-function: ease-in;
   top: 100%;
