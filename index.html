@@ -37,19 +37,14 @@
 		const drawer = document.querySelector(`.drawer`);
 		const mInfo = document.querySelector(`.mobile_info_box`);
 		drawer.style.display = 'none';
-		// mInfo.style.display = 'none';
 		mInfo.style.top = '100%';
 	}
 	const mInfoBox = document.querySelector('.mobile_info_box');
 	mInfoBox.addEventListener('click', (event) => {
-		console.log(event.target.id);
 		if(event.target.id != 'mclose') event.stopPropagation();
 	}, true);
 
 	let reservationDatas = [];
-	const test = (el) => {
-		console.log(el.customer.name);
-	}
 	const fetchData = () => {
 		var xhr = new XMLHttpRequest();
 		xhr.open('GET', 'https://frontend.tabling.co.kr/v1/store/9533/reservations', true);
@@ -132,7 +127,6 @@
 						const drawer = document.querySelector(`.drawer`);
 						const mInfo = document.querySelector(`.mobile_info_box`);
 						drawer.style.display = 'block';
-						// mInfo.style.display = 'block';
 						mInfo.style.top = '80px';
 
 						document.querySelector(".mobile_info_box").innerHTML = `
