@@ -25,6 +25,8 @@
 	let delay = 300;
 	let timer = null;
 	let isMobile = false;
+	let reservationDatas = [];
+	let boxClickInfoIndex = 0;
 	isMobile = (window.innerWidth > 576) ? false : true;
 	window.addEventListener('resize', function(){
 		clearTimeout(timer);
@@ -43,8 +45,146 @@
 	mInfoBox.addEventListener('click', (event) => {
 		if(event.target.id != 'mclose') event.stopPropagation();
 	}, true);
+	const dataRender = (data) => {
+		document.querySelector(".item_box").innerHTML = '';
+		data.forEach((el, index) => {
+			document.querySelector(".item_box").innerHTML += `<div class="item item${index}" style="display: ${el.status == 'done'? 'none':'flex'};">
+				<div class="item_status">
+					<div>${el.timeRegistered}</div>
+					<div style="color:${el.status == 'reserved' ? '#3BB94C':'#162149'};">${el.status == 'reserved' ? '예약':'착석 중'}</div>
+				</div>
+				<div class="item_detail">
+					<div class="table">${el.customer.name} - 테이블명 [<p class="table_name${index}"></p>]</div>
+					<div>성인 ${el.customer.adult} 아이 ${el.customer.child}</div>
+					<div class="menu">메뉴명(갯수) [<p class="menu${index}"></p>]</div>
+				</div>
+				<div class="item_control">
+					<button class="pur_btn" style="background-color: ${el.status == 'reserved' ? 'rgb(22, 30, 64)':'white'};color: ${el.status == 'reserved' ? 'white':'black'};">${el.status == 'reserved' ? '착석':'퇴석'}</button>
+				</div>
+			</div>`
+			el.tables.forEach((table) => {
+				document.querySelector(`.table_name${index}`).innerHTML += `, ${table.name}`
+			});
+			el.menus.forEach((menu) => {
+				document.querySelector(`.menu${index}`).innerHTML += `, ${menu.name}(${menu.qty})`
+			});
+		});
+		makeButtonEvent();
+		const status_boxs = document.querySelectorAll('.item_status');
+		status_boxs.forEach((box, idx) => {
+			box.addEventListener('click', (event) => {
+				boxClick(idx);
+			})
+		});
+		const detail_boxs = document.querySelectorAll('.item_detail');
+		detail_boxs.forEach((box, idx) => {
+			box.addEventListener('click', (event) => {
+				boxClick(idx);
+			})
+		});
+	}
 
-	let reservationDatas = [];
+	const makeButtonEvent = () => {
+		const buttons = document.querySelectorAll('.pur_btn');
+		buttons.forEach((button, idx) => {
+			button.addEventListener('click', (event) => {
+				// console.log(button.textContent);
+				if(button.textContent == '착석') {
+					event.target.textContent = '퇴석';
+					button.style.backgroundColor = 'white';
+					button.style.color = 'black';
+					reservationDatas[idx].status = 'seated';
+					dataRender(reservationDatas);
+					if(idx == boxClickInfoIndex) {
+						boxClick(idx);
+					}
+				} else {
+					const item = document.querySelector(`.item${idx}`)
+					item.remove();
+					reservationDatas.splice(idx, 1);
+					dataRender(reservationDatas);
+				}
+			});
+		});
+	}
+
+	const boxClick = (idx) => {
+		boxClickInfoIndex = idx;
+		document.querySelector(".info_box").innerHTML = `
+			<div class="info_main_title">예약 정보</div>
+			<div class="row" style="column-gap: 24px;">
+				<div class="info_sub_title">예약 상태</div>
+				<div style="color:${reservationDatas[idx].status == 'reserved' ? '#3BB94C':'#162149'};">${reservationDatas[idx].status == 'reserved' ? '예약':'착석 중'}</div>
+			</div>
+			<div class="row" style="column-gap: 24px;">
+				<div class="info_sub_title">예약 시간</div>
+				<div>${reservationDatas[idx].timeReserved}</div>
+			</div>
+			<div class="row" style="column-gap: 24px;">
+				<div class="info_sub_title">접수 시간</div>
+				<div>${reservationDatas[idx].timeRegistered}</div>
+			</div>
+			<div class="info_main_title">고객 정보</div>
+			<div class="row" style="column-gap: 24px;">
+				<div class="info_sub_title">고객 성명</div>
+				<div class="info_name">${reservationDatas[idx].customer.name}</div>
+			</div>
+			<div class="row" style="column-gap: 24px;">
+				<div class="info_sub_title">고객 등급</div>
+				<div>${reservationDatas[idx].customer.level}</div>
+			</div>
+			<div class="row" style="column-gap: 24px;">
+				<div class="info_sub_title">고객 메모</div>
+				<div style="width:210px;"><p class="info_p">${reservationDatas[idx].customer.memo}</p></div>
+			</div>
+			<div class="row" style="column-gap: 24px;">
+				<div class="info_sub_title">요청사항</div>
+				<div style="width:210px;"><p class="info_p">${reservationDatas[idx].customer.request}</p></div>
+			</div>
+		`
+		if(isMobile) {
+			const drawer = document.querySelector(`.drawer`);
+			const mInfo = document.querySelector(`.mobile_info_box`);
+			drawer.style.display = 'block';
+			mInfo.style.top = '80px';
+			document.querySelector(".mobile_info_box").innerHTML = `
+				<div class="minfo_content">
+					<button class="mInfo_Close" onClick="drawerClick()" id="mclose">닫기</button>
+					<div class="info_main_title">예약 정보</div>
+					<div class="row" style="column-gap: 24px;">
+						<div class="info_sub_title">예약 상태</div>
+						<div style="color:${reservationDatas[idx].status == 'reserved' ? '#3BB94C':'#162149'};">${reservationDatas[idx].status == 'reserved' ? '예약':'착석 중'}</div>
+					</div>
+					<div class="row" style="column-gap: 24px;">
+						<div class="info_sub_title">예약 시간</div>
+						<div>${reservationDatas[idx].timeReserved}</div>
+					</div>
+					<div class="row" style="column-gap: 24px;margin-bottom:24px;">
+						<div class="info_sub_title">접수 시간</div>
+						<div>${reservationDatas[idx].timeRegistered}</div>
+					</div>
+					<div class="info_main_title">고객 정보</div>
+					<div class="row" style="column-gap: 24px;">
+						<div class="info_sub_title">고객 성명</div>
+						<div class="info_name">${reservationDatas[idx].customer.name}</div>
+					</div>
+					<div class="row" style="column-gap: 24px;">
+						<div class="info_sub_title">고객 등급</div>
+						<div>${reservationDatas[idx].customer.level}</div>
+					</div>
+					<div class="row" style="column-gap: 24px;">
+						<div class="info_sub_title">고객 메모</div>
+						<div style="width:60vw;"><p class="info_p">${reservationDatas[idx].customer.memo}</p></div>
+					</div>
+					<div class="row" style="column-gap: 24px;">
+						<div class="info_sub_title">요청사항</div>
+						<div style="width:210px;"><p class="info_p">${reservationDatas[idx].customer.request}</p></div>
+					</div>
+				</div>
+			`
+		}
+	}
+
 	const fetchData = () => {
 		var xhr = new XMLHttpRequest();
 		xhr.open('GET', 'https://frontend.tabling.co.kr/v1/store/9533/reservations', true);
@@ -54,131 +194,9 @@
 				const data = JSON.parse(xhr.response).reservations;
 				reservationDatas = data;
 				console.log('reservationDatas', data);
-				data.forEach((el, index) => {
-					document.querySelector(".item_box").innerHTML += `<div class="item item${index}" style="display: ${el.status == 'done'? 'none':'flex'};">
-						<div class="item_status">
-							<div>${el.timeRegistered}</div>
-							<div style="color:${el.status == 'reserved' ? '#3BB94C':'#162149'};">${el.status == 'reserved' ? '예약':'착석 중'}</div>
-						</div>
-						<div class="item_detail">
-							<div class="table">${el.customer.name} - 테이블명 [<p class="table_name${index}"></p>]</div>
-							<div>성인 ${el.customer.adult} 아이 ${el.customer.child}</div>
-							<div class="menu">메뉴명(갯수) [<p class="menu${index}"></p>]</div>
-						</div>
-						<div class="item_control">
-							<button class="pur_btn" style="background-color: ${el.status == 'reserved' ? 'rgb(22, 30, 64)':'white'};color: ${el.status == 'reserved' ? 'white':'black'};">${el.status == 'reserved' ? '착석':'퇴석'}</button>
-						</div>
-					</div>`
-					el.tables.forEach((table) => {
-						document.querySelector(`.table_name${index}`).innerHTML += `, ${table.name}`
-					});
-					el.menus.forEach((menu) => {
-						document.querySelector(`.menu${index}`).innerHTML += `, ${menu.name}(${menu.qty})`
-					});
-				});
-				const buttons = document.querySelectorAll('.pur_btn');
-				buttons.forEach((button, idx) => {
-					button.addEventListener('click', (event) => {
-						console.log(button.textContent);
-						if(button.textContent == '착석') {
-							event.target.textContent = '퇴석';
-							button.style.backgroundColor = 'white';
-							button.style.color = 'black';
-						} else {
-							const item = document.querySelector(`.item${idx}`)
-							item.remove();
-						}
-					});
-				});
-				const boxClick = (idx) => {
-					document.querySelector(".info_box").innerHTML = `
-						<div class="info_main_title">예약 정보</div>
-						<div class="row" style="column-gap: 24px;">
-							<div class="info_sub_title">예약 상태</div>
-							<div style="color:${reservationDatas[idx].status == 'reserved' ? '#3BB94C':'#162149'};">${reservationDatas[idx].status == 'reserved' ? '예약':'착석 중'}</div>
-						</div>
-						<div class="row" style="column-gap: 24px;">
-							<div class="info_sub_title">예약 시간</div>
-							<div>${reservationDatas[idx].timeReserved}</div>
-						</div>
-						<div class="row" style="column-gap: 24px;">
-							<div class="info_sub_title">접수 시간</div>
-							<div>${reservationDatas[idx].timeRegistered}</div>
-						</div>
-						<div class="info_main_title">고객 정보</div>
-						<div class="row" style="column-gap: 24px;">
-							<div class="info_sub_title">고객 성명</div>
-							<div class="info_name">${reservationDatas[idx].customer.name}</div>
-						</div>
-						<div class="row" style="column-gap: 24px;">
-							<div class="info_sub_title">고객 등급</div>
-							<div>${reservationDatas[idx].customer.level}</div>
-						</div>
-						<div class="row" style="column-gap: 24px;">
-							<div class="info_sub_title">고객 메모</div>
-							<div style="width:210px;"><p class="info_p">${reservationDatas[idx].customer.memo}</p></div>
-						</div>
-						<div class="row" style="column-gap: 24px;">
-							<div class="info_sub_title">요청사항</div>
-							<div style="width:210px;"><p class="info_p">${reservationDatas[idx].customer.request}</p></div>
-						</div>
-					`
-					if(isMobile) {
-						const drawer = document.querySelector(`.drawer`);
-						const mInfo = document.querySelector(`.mobile_info_box`);
-						drawer.style.display = 'block';
-						mInfo.style.top = '80px';
-
-						document.querySelector(".mobile_info_box").innerHTML = `
-							<div class="minfo_content">
-								<button class="mInfo_Close" onClick="drawerClick()" id="mclose">닫기</button>
-								<div class="info_main_title">예약 정보</div>
-								<div class="row" style="column-gap: 24px;">
-									<div class="info_sub_title">예약 상태</div>
-									<div style="color:${reservationDatas[idx].status == 'reserved' ? '#3BB94C':'#162149'};">${reservationDatas[idx].status == 'reserved' ? '예약':'착석 중'}</div>
-								</div>
-								<div class="row" style="column-gap: 24px;">
-									<div class="info_sub_title">예약 시간</div>
-									<div>${reservationDatas[idx].timeReserved}</div>
-								</div>
-								<div class="row" style="column-gap: 24px;margin-bottom:24px;">
-									<div class="info_sub_title">접수 시간</div>
-									<div>${reservationDatas[idx].timeRegistered}</div>
-								</div>
-								<div class="info_main_title">고객 정보</div>
-								<div class="row" style="column-gap: 24px;">
-									<div class="info_sub_title">고객 성명</div>
-									<div class="info_name">${reservationDatas[idx].customer.name}</div>
-								</div>
-								<div class="row" style="column-gap: 24px;">
-									<div class="info_sub_title">고객 등급</div>
-									<div>${reservationDatas[idx].customer.level}</div>
-								</div>
-								<div class="row" style="column-gap: 24px;">
-									<div class="info_sub_title">고객 메모</div>
-									<div style="width:60vw;"><p class="info_p">${reservationDatas[idx].customer.memo}</p></div>
-								</div>
-								<div class="row" style="column-gap: 24px;">
-									<div class="info_sub_title">요청사항</div>
-									<div style="width:210px;"><p class="info_p">${reservationDatas[idx].customer.request}</p></div>
-								</div>
-							</div>
-						`
-					}
-				}
+				dataRender(data);
+				
 				if(!isMobile) boxClick(0);
-				const status_boxs = document.querySelectorAll('.item_status');
-				status_boxs.forEach((box, idx) => {
-					box.addEventListener('click', (event) => {
-						boxClick(idx);
-					})
-				});
-				const detail_boxs = document.querySelectorAll('.item_detail');
-				detail_boxs.forEach((box, idx) => {
-					box.addEventListener('click', (event) => {
-						boxClick(idx);
-					})
-				});
 			} else {
 				
 			}
