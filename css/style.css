@@ -1,6 +1,6 @@
 @charset "UTF-8";
 @font-face {
-  font-family: AppleMyungjo;
+  font-family: AppleMyungjo, Helvetica, Arial, sans-serif;
   src: local("Apple SD Gothic Neo"), local("Nanum Gothic");
 }
 
